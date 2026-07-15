@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- HTTPS 모바일 웹 앱 표준 규격 반영 -->
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>NFC Smart Clothing - Eco Hormone Loop</title>
+    <!-- Tailwind CSS CDN (HTTPS 전용 보안 링크) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome (HTTPS 전용 암호화 보안 아이콘 라이브러리) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: radial-gradient(circle at center, #090d16 0%, #020408 100%);
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 미세한 모바일 친화 격자선 효과 */
+        .bg-grid {
+            background-size: 30px 30px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+        }
+
+        /* 네온 광채 비주얼 디자인 이펙트 */
+        .neon-glow-emerald {
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.6), 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+        .neon-glow-purple {
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.6), 0 0 20px rgba(168, 85, 247, 0.3);
+        }
+        .neon-glow-gold {
+            text-shadow: 0 0 10px rgba(234, 179, 8, 0.6), 0 0 20px rgba(234, 179, 8, 0.3);
+        }
+        .box-glow-emerald {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.15);
+        }
+
+        /* D-Day 인트로 스케일 및 이동 시퀀스 애니메이션 */
+        .dday-intro-animation {
+            animation: introSequence 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes introSequence {
+            0% {
+                transform: translate(-50%, -50%) scale(0.3);
+                opacity: 0;
+                filter: blur(10px);
+                font-size: 5rem;
+            }
+            15% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 1;
+                filter: blur(0px);
+                font-size: 5rem;
+            }
+            25% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+                font-size: 5rem;
+                text-shadow: 0 0 35px rgba(16, 185, 129, 0.8), 0 0 70px rgba(168, 85, 247, 0.5);
+            }
+            65% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+                top: 50%;
+                left: 50%;
+                font-size: 5rem;
+            }
+            100% {
+                transform: translate(-50%, 0) scale(1);
+                opacity: 1;
+                top: 108px; /* 헤더 아래 고정 수축 안착 위치 */
+                left: 50%;
+                font-size: 2.25rem;
+                text-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+            }
+        }
+
+        /* 모달 팝업 바운스 인 애니메이션 */
+        @keyframes modalSlideUp {
+            0% { transform: scale(0.9) translateY(40px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .animate-modal-pop {
+            animation: modalSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* 혈류를 흐르는 에코 호르몬 애니메이션 */
+        @keyframes flowBlood {
+            0% { stroke-dashoffset: 200; }
+            100% { stroke-dashoffset: 0; }
+        }
+        .blood-stream-line {
+            stroke-dasharray: 8 4;
+            animation: flowBlood 8s linear infinite;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex flex-col justify-between bg-grid relative selection:bg-emerald-500 selection:text-white">
+
+    <!-- 감각적인 은은한 에코 그라데이션 조명 백그라운드 -->
+    <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-emerald-950/20 rounded-full filter blur-[100px] pointer-events-none"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-950/20 rounded-full filter blur-[100px] pointer-events-none"></div>
+
+    <!-- 헤더 레이아웃 -->
+    <header class="w-full px-6 py-5 flex justify-between items-center z-40 relative">
+        <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-emerald-500 to-purple-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                <i class="fa-solid fa-nfc-magnifying-glass text-xs"></i>
+            </div>
+            <span class="text-xs font-black tracking-widest text-slate-400">ECO HORMONE</span>
+        </div>
+
+        <!-- 가로가 넓고 둥근 타원형 포인트 보드 (pM 구조) -->
+        <div id="point-container" class="relative group cursor-pointer transition-all duration-300 transform hover:scale-105 active:scale-95">
+            <div class="px-5 py-2 rounded-full bg-slate-950/90 border border-emerald-500/30 flex items-center justify-center space-x-1.5 box-glow-emerald backdrop-blur-md min-w-[125px]">
+                <span class="text-xs font-bold text-emerald-400 tracking-wider">p</span>
+                <!-- 누적 에코 마일리지 M 출력 컴포넌트 -->
+                <span id="point-display" class="text-base font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-yellow-200 neon-glow-emerald">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 타겟 디스플레이 영역 -->
+    <main class="flex-grow flex flex-col items-center justify-center px-6 relative z-10">
+        
+        <!-- D-Day 텍스트 애니메이션 수축 이동 앵커 공간 -->
+        <div id="dday-hero-container" class="absolute w-full flex justify-center pointer-events-none" style="top: 50%; left: 50%; transform: translate(-50%, -50%); height: 1px;">
+            <!-- 등록 성공 시 'D+N' 타이포가 주입되어 기동합니다. -->
+        </div>
+
+        <!-- [상태 1] 최초 접속 시 활성화되는 구매일 입력 카드 -->
+        <div id="welcome-view" class="text-center max-w-sm mx-auto transition-all duration-500 py-12">
+            <div class="mb-6 inline-flex p-6 rounded-full bg-gradient-to-b from-emerald-500/10 to-transparent border border-emerald-500/20">
+                <i class="fa-solid fa-seedling text-5xl text-emerald-400 animate-pulse"></i>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight mb-2">지구를 살리는 의류 호르몬</h1>
+            <p class="text-sm text-slate-400 mb-8 leading-relaxed">
+                NFC 칩셋 인식에 성공했습니다.<br>
+                구매 시점을 등록하고 표적 기관으로 호르몬 전달을 시작해 보세요.
+            </p>
+            <button onclick="openDatePickerModal()" class="px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all duration-300 transform active:scale-95 text-base tracking-wide flex items-center justify-center space-x-2 mx-auto">
+                <i class="fa-regular fa-calendar-check text-lg"></i>
+                <span>최초 구매날짜 등록</span>
+            </button>
+            <p class="text-[11px] text-amber-500/80 mt-4">
+                <i class="fa-solid fa-lock"></i> 한 번 지정된 소중한 구매일은 사후에 조작할 수 없습니다.
+            </p>
+        </div>
+
+        <!-- [상태 2] 설정 완료 후 차단 상태의 순환 사이클 인포그래픽 화면 -->
+        <div id="active-view" class="hidden text-center max-w-sm mx-auto transition-all duration-500 py-12 mt-32">
+            <div class="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md mb-6">
+                <p class="text-xs text-slate-400 uppercase tracking-widest mb-1 font-bold">에코 소장 사이클 통계</p>
+                <div class="flex items-center justify-center space-x-2 mt-1">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <p id="date-info" class="text-xs text-emerald-300 font-bold">최초 등록일: -</p>
+                </div>
+                
+                <!-- [생명과학 호르몬 이동 원리 시각화 인터랙티브 SVG] -->
+                <div class="mt-6 py-4 px-2 rounded-xl bg-slate-950/40 border border-white/5 flex flex-col items-center">
+                    <span class="text-[11px] font-bold text-slate-400 tracking-wider mb-2">혈류를 통한 에코 호르몬 전달 과정</span>
+                    
+                    <svg class="w-full h-32" viewBox="0 0 200 80">
+                        <!-- 분비샘 (시작 지점: NFC 칩셋) -->
+                        <circle cx="25" cy="40" r="10" fill="#047857" opacity="0.3"/>
+                        <circle cx="25" cy="40" r="5" fill="#10b981"/>
+                        <text x="25" y="65" font-size="7" fill="#64748b" text-anchor="middle" font-weight="bold">분비샘 (NFC)</text>
+
+                        <!-- 연결관 (혈관 모사 곡선 구조) -->
+                        <path id="blood-path" d="M 35 40 Q 100 10, 165 40" fill="none" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+                        <!-- 실제 흐르는 에코 호르몬 파티클 스트림 라인 -->
+                        <path d="M 35 40 Q 100 10, 165 40" fill="none" stroke="#10b981" stroke-width="2" class="blood-stream-line" stroke-linecap="round"/>
+
+                        <!-- 표적 기관 (최종 목적지: 가치 달성) -->
+                        <circle cx="175" cy="40" r="10" fill="#6b21a8" opacity="0.3" id="target-gland-bg"/>
+                        <circle cx="175" cy="40" r="5" fill="#a855f7" id="target-gland-core"/>
+                        <text x="175" y="65" font-size="7" fill="#64748b" text-anchor="middle" font-weight="bold">표적 기관 (가치)</text>
+
+                        <!-- 혈관 중간을 타고 이동하는 호르몬 방울 애니메이션 -->
+                        <circle id="hormone-drop" r="3" fill="#fbbf24" opacity="0">
+                            <animateMotion id="drop-motion" dur="4s" repeatCount="indefinite" path="M 35 40 Q 100 10, 165 40" begin="0s"/>
+                        </circle>
+                    </svg>
+
+                    <p id="hormone-status-msg" class="text-[10px] text-slate-400 mt-2 font-medium">호르몬이 완만하게 이동 중입니다...</p>
+                </div>
+            </div>
+
+            <!-- 완벽한 락다운 가이드 안내 -->
+            <p class="text-[11px] text-slate-500 flex items-center justify-center gap-1.5 cursor-default">
+                <i class="fa-solid fa-lock text-emerald-500/40"></i>
+                <span>NFC 의류 정품 보증 정책에 따라 등록일을 수정할 수 없습니다.</span>
+            </p>
+        </div>
+
+    </main>
+
+    <!-- 시뮬레이터 (동작 확인 및 디버깅용 패널) -->
+    <footer class="w-full p-4 bg-slate-950/90 border-t border-white/5 backdrop-blur-md z-40 relative">
+        <div class="max-w-md mx-auto">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-slate-500 tracking-wider flex items-center gap-1">
+                    <i class="fa-solid fa-vial text-emerald-400"></i> SYSTEM SIMULATOR (시뮬레이터)
+                </span>
+                <span class="text-[10px] text-slate-600">D+N 충족 포인트 선지급 확인 장치</span>
+            </div>
+            <!-- 가상 D-Day 버튼들을 통하여 기획 요구사항 포인트 합산 즉시 검증 -->
+            <div class="grid grid-cols-4 gap-1.5">
+                <button onclick="simulateDday(10)" class="py-2 px-1 bg-white/5 hover:bg-white/10 rounded text-[11px] transition font-medium border border-white/5">D+10</button>
+                <button onclick="simulateDday(100)" class="py-2 px-1 bg-purple-900/40 hover:bg-purple-900/60 rounded text-[11px] transition font-bold border border-purple-500/30 text-purple-200">D+100</button>
+                <button onclick="simulateDday(364)" class="py-2 px-1 bg-slate-900/40 hover:bg-slate-800 rounded text-[11px] transition font-semibold text-slate-400 border border-white/5">D+364</button>
+                <button onclick="simulateDday(365)" class="py-2 px-1 bg-yellow-900/40 hover:bg-yellow-900/60 rounded text-[11px] transition font-bold border border-yellow-500/30 text-yellow-200">D+365</button>
+                <button onclick="simulateDday(499)" class="py-2 px-1 bg-slate-900/40 hover:bg-slate-800 rounded text-[11px] transition font-semibold text-slate-400 border border-white/5">D+499</button>
+                <button onclick="simulateDday(500)" class="py-2 px-1 bg-blue-900/40 hover:bg-blue-900/60 rounded text-[11px] transition font-bold border border-blue-500/30 text-blue-200">D+500</button>
+                <button onclick="simulateDday(730)" class="py-2 px-1 bg-emerald-900/40 hover:bg-emerald-900/60 rounded text-[11px] transition font-bold border border-emerald-500/30 text-emerald-200">D+730</button>
+                <button onclick="resetApp()" class="py-2 px-1 bg-red-950/50 hover:bg-red-900 text-red-200 rounded text-[11px] transition font-medium border border-red-500/20">초기화</button>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- 모달 1: 최초 등록 달력창 -->
+    <div id="date-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-white/10 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl box-glow-emerald animate-modal-pop">
+            <div class="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-calendar-days text-xl text-emerald-400"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-1">최초 구매일 등록</h3>
+            <p class="text-xs text-slate-400 mb-6">등록하신 소유 시점 정보는 사후 위조를 위해 잠깁니다.</p>
+            
+            <div class="mb-6">
+                <input type="date" id="purchase-date-input" 
+                       class="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white text-center focus:outline-none focus:border-emerald-500 transition-all font-semibold">
+            </div>
+
+            <div class="flex space-x-2">
+                <button onclick="closeDatePickerModal()" class="w-1/3 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-medium transition text-sm">
+                    취소
+                </button>
+                <button onclick="savePurchaseDate()" class="w-2/3 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black transition text-sm shadow-md shadow-emerald-500/10">
+                    NFC 매칭 등록하기
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 모달 2: "환경 의류 지수 증가" 에코 보너스 팝업 모달 -->
+    <div id="point-reward-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border-2 border-emerald-500/30 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl shadow-emerald-500/10 animate-modal-pop relative overflow-hidden">
+            <div class="absolute -top-12 -left-12 w-24 h-24 bg-emerald-500/10 rounded-full filter blur-xl"></div>
+            <div class="absolute -bottom-12 -right-12 w-24 h-24 bg-purple-500/10 rounded-full filter blur-xl"></div>
+            
+            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-300 flex items-center justify-center mx-auto mb-4 animate-bounce shadow-lg shadow-emerald-500/20">
+                <i class="fa-solid fa-leaf text-2xl text-slate-950"></i>
+            </div>
+            
+            <!-- 요청 지칭 슬로건 "환경 의류 지수 증가" 고정 배치 -->
+            <h3 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-400 neon-glow-emerald mb-1">
+                환경 의류 지수 증가
+            </h3>
+            
+            <p id="reward-condition-text" class="text-xs text-purple-300 font-bold tracking-widest uppercase mb-4">D+100 REACHED</p>
+            
+            <div class="py-4 px-6 rounded-2xl bg-white/5 border border-white/10 mb-6 flex flex-col justify-center items-center">
+                <span class="text-xs text-slate-400">지속 보존 누적 마일리지</span>
+                <span class="text-3xl font-black text-yellow-300 tracking-wide mt-1 animate-pulse">+1,000 P</span>
+            </div>
+
+            <p class="text-[11px] text-slate-400 leading-relaxed mb-6">
+                단일 의류 소장 주기를 지속 가능하게 가꾸어 주셨습니다.<br>
+                감사의 의미로 순환 생태계 보상 마일리지를 충전합니다!
+            </p>
+
+            <button onclick="closeRewardModal()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black tracking-wide transition text-sm shadow-lg shadow-emerald-500/15">
+                포인트 승인하기
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        // 전역 인메모리 관리
+        let appState = {
+            purchaseDate: null,
+            points: 0,
+            hasRewarded: {} // 특정 마일스톤 중복 팝업 연출 제한 해시 구조
+        };
+
+        const STORAGE_KEY = 'NFC_CLOTHING_APP_STATE_v9_https';
+
+        window.onload = function() {
+            // 로컬 가용 스토리지 복구
+            const savedState = localStorage.getItem(STORAGE_KEY);
+            if (savedState) {
+                appState = JSON.parse(savedState);
+                
+                if (typeof appState.points !== 'number') {
+                    appState.points = 0;
+                }
+                if (!appState.hasRewarded) {
+                    appState.hasRewarded = {};
+                }
+                
+                // 포인트 표시 동기화
+                updatePointDisplay(appState.points);
+
+                // 이미 등록일 완료 상태라면 즉시 렌더링
+                if (appState.purchaseDate) {
+                    initAppWithDate(appState.purchaseDate, false);
+                }
+            } else {
+                document.getElementById('welcome-view').classList.remove('hidden');
+                document.getElementById('active-view').classList.add('hidden');
+            }
+        };
+
+        // 우측 상단 포인트 M 카운트업 롤링 모션
+        function updatePointDisplay(targetValue) {
+            const displayEl = document.getElementById('point-display');
+            let currentVal = parseInt(displayEl.innerText) || 0;
+            if (currentVal === targetValue) {
+                displayEl.innerText = targetValue;
+                return;
+            }
+
+            const duration = 1200;
+            const startTime = performance.now();
+
+            function animatePoint(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const easeProgress = progress * (2 - progress); // easeOutQuad
+                const val = Math.floor(currentVal + (targetValue - currentVal) * easeProgress);
+                
+                displayEl.innerText = val;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animatePoint);
+                } else {
+                    displayEl.innerText = targetValue;
+                }
+            }
+            requestAnimationFrame(animatePoint);
+        }
+
+        // 달력 등록 패널 호출
+        function openDatePickerModal() {
+            const inputEl = document.getElementById('purchase-date-input');
+            const todayStr = new Date().toISOString().substring(0, 10);
+            inputEl.value = appState.purchaseDate || todayStr;
+            
+            document.getElementById('date-modal').classList.remove('hidden');
+        }
+
+        // 달력 등록 패널 언로드
+        function closeDatePickerModal() {
+            document.getElementById('date-modal').classList.add('hidden');
+        }
+
+        // 구매 시점 저장
+        function savePurchaseDate() {
+            const selectedDate = document.getElementById('purchase-date-input').value;
+            if (!selectedDate) {
+                return;
+            }
+
+            appState.purchaseDate = selectedDate;
+            
+            // 경과 기한에 따른 소급 적립액 환산
+            const dDiff = calculateDDay(selectedDate);
+            appState.points = calculateCumulativePoints(dDiff);
+            
+            saveToStorage();
+            closeDatePickerModal();
+
+            // 인트로 가동
+            initAppWithDate(selectedDate, true); 
+        }
+
+        // D-Day 일수 구하기
+        function calculateDDay(dateString) {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
+            const parts = dateString.split('-');
+            const purchase = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            
+            const timeDiff = today.getTime() - purchase.getTime();
+            const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            
+            return daysDiff;
+        }
+
+        /* ★ 등차/주기 수열 기반 자동 포인트 정산 공식 ★
+           
+           * D < 100일: 0 P
+           * D >= 100일: 기본 +1,000 P 지급
+           * 365k 일 마다: 추가 +1,000 P
+           * 500k 일 마다: 추가 +1,000 P
+        */
+        function calculateCumulativePoints(dDiff) {
+            if (dDiff < 100) return 0;
+            
+            let points = 0;
+            
+            if (dDiff >= 100) {
+                points += 1000;
+            }
+            
+            const count365 = Math.floor(dDiff / 365);
+            points += count365 * 1000;
+            
+            const count500 = Math.floor(dDiff / 500);
+            points += count500 * 1000;
+            
+            return points;
+        }
+
+        /* 정확히 이정표에 일치했는지 여부만 체크 */
+        function checkExactMilestone(dDiff) {
+            if (dDiff <= 0) return { isExact: false, reason: "" };
+
+            if (dDiff === 100) {
+                return { isExact: true, reason: "소유 보존 100일 돌파" };
+            }
+            if (dDiff > 0 && dDiff % 365 === 0) {
+                return { isExact: true, reason: `순환 주기 365k (${dDiff}일) 돌파` };
+            }
+            if (dDiff > 0 && dDiff % 500 === 0) {
+                return { isExact: true, reason: `소환 등차수열 500k (${dDiff}일) 돌파` };
+            }
+
+            return { isExact: false, reason: "" };
+        }
+
+        // 앱 구동 및 레이아웃 상태 변경
+        function initAppWithDate(dateString, triggerIntroAnimation = false) {
+            const dDiff = calculateDDay(dateString);
+            
+            // 등록일 텍스트 출력 교체
+            document.getElementById('date-info').innerText = `최초 등록일: ${dateString} (D+${dDiff})`;
+
+            // 메인 뷰 상태 변경
+            document.getElementById('welcome-view').classList.add('hidden');
+            document.getElementById('active-view').classList.remove('hidden');
+
+            // 1. D-Day 중앙 배치 시퀀스 모션 처리
+            if (triggerIntroAnimation) {
+                triggerDDayEntrance(dDiff);
+            } else {
+                renderStaticDDay(dDiff);
+            }
+
+            // 2. 누적 및 호르몬 SVG 시각 정보 동적 갱신
+            const absolutePoints = calculateCumulativePoints(dDiff);
+            updateHormoneVisuals(dDiff);
+            
+            // 만약 마일스톤 정합 시점 도달이고 수령한 이력이 없으면 축하 모달 발동
+            const milestoneCheck = checkExactMilestone(dDiff);
+            const rewardKey = `reward_${dDiff}`;
+
+            if (milestoneCheck.isExact && !appState.hasRewarded[rewardKey]) {
+                appState.points = absolutePoints;
+                updatePointDisplay(appState.points);
+
+                setTimeout(() => {
+                    triggerPointReward(dDiff, milestoneCheck.reason);
+                    appState.hasRewarded[rewardKey] = true;
+                    saveToStorage();
+                }, triggerIntroAnimation ? 3500 : 600);
+            } else {
+                // 당일이 아닐지라도 누적 가치 포인트는 즉시 로딩
+                appState.points = absolutePoints;
+                updatePointDisplay(appState.points);
+                saveToStorage();
+            }
+        }
+
+        // 호르몬 전달 과정 인터랙티브 SVG 비주얼 업데이트 함수
+        function updateHormoneVisuals(dDiff) {
+            const drop = document.getElementById('hormone-drop');
+            const targetBg = document.getElementById('target-gland-bg');
+            const targetCore = document.getElementById('target-gland-core');
+            const statusMsg = document.getElementById('hormone-status-msg');
+
+            if (dDiff >= 365) {
+                // 365일 이상 (호르몬 완벽 전달 및 활성화 상태)
+                drop.setAttribute('opacity', '1');
+                targetBg.setAttribute('fill', '#10b981');
+                targetCore.setAttribute('fill', '#fbbf24');
+                statusMsg.innerText = "착한 소유 호르몬이 표적 기관에 완전히 도달하여 활성화되었습니다!";
+                statusMsg.className = "text-[10px] text-emerald-400 mt-2 font-bold";
+            } else if (dDiff >= 100) {
+                // 100일 이상 (호르몬 반쯤 도달 단계)
+                drop.setAttribute('opacity', '0.8');
+                targetBg.setAttribute('fill', '#6b21a8');
+                targetCore.setAttribute('fill', '#10b981');
+                statusMsg.innerText = "호르몬이 표적 기관 근방에 도달하여 활성화를 유도하고 있습니다.";
+                statusMsg.className = "text-[10px] text-purple-300 mt-2 font-medium";
+            } else {
+                // 100일 미만 (분비 단계)
+                drop.setAttribute('opacity', '0.4');
+                targetBg.setAttribute('fill', '#1e293b');
+                targetCore.setAttribute('fill', '#64748b');
+                statusMsg.innerText = "소장이 시작되어 에코 호르몬이 분비샘(NFC)을 출발했습니다.";
+                statusMsg.className = "text-[10px] text-slate-500 mt-2 font-medium";
+            }
+        }
+
+        // 중앙 거대화 후 상단 안착 연출
+        function triggerDDayEntrance(dValue) {
+            const container = document.getElementById('dday-hero-container');
+            container.innerHTML = '';
+
+            const ddayText = document.createElement('div');
+            ddayText.id = "dynamic-dday-text";
+            ddayText.className = "absolute text-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-purple-500 neon-glow-emerald dday-intro-animation whitespace-nowrap cursor-default";
+            ddayText.innerText = `D+${dValue}`;
+
+            container.appendChild(ddayText);
+        }
+
+        // 고정 위치 직접 수동 렌더링
+        function renderStaticDDay(dValue) {
+            const container = document.getElementById('dday-hero-container');
+            container.innerHTML = '';
+
+            const ddayText = document.createElement('div');
+            ddayText.id = "dynamic-dday-text";
+            ddayText.className = "absolute text-center font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-purple-500 neon-glow-emerald whitespace-nowrap cursor-default";
+            ddayText.style.top = "108px";
+            ddayText.style.left = "50%";
+            ddayText.style.transform = "translate(-50%, 0)";
+            ddayText.style.fontSize = "2.25rem";
+            ddayText.innerText = `D+${dValue}`;
+
+            container.appendChild(ddayText);
+        }
+
+        // 환경 의류 지수 보상 알림 모달 출력
+        function triggerPointReward(dValue, reasonText) {
+            const modal = document.getElementById('point-reward-modal');
+            const conditionEl = document.getElementById('reward-condition-text');
+            
+            conditionEl.innerText = `${reasonText}`;
+            modal.classList.remove('hidden');
+        }
+
+        // 포인트 축하 창 종료
+        function closeRewardModal() {
+            const modal = document.getElementById('point-reward-modal');
+            modal.classList.add('hidden');
+        }
+
+        // 로컬 보존 세이브
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+        }
+
+        // 기획 구동 시뮬레이터
+        function simulateDday(targetDays) {
+            const today = new Date();
+            const simulatedDate = new Date(today.getTime() - (targetDays * 24 * 60 * 60 * 1000));
+            
+            const yyyy = simulatedDate.getFullYear();
+            const mm = String(simulatedDate.getMonth() + 1).padStart(2, '0');
+            const dd = String(simulatedDate.getDate()).padStart(2, '0');
+            
+            const dateStr = `${yyyy}-${mm}-${dd}`;
+            
+            initAppWithDate(dateStr, true);
+        }
+
+        // 초기화 처리
+        function resetApp() {
+            if (confirm("정말로 최초 설정 상태로 되돌리시겠습니까?\n모든 데이터가 소실되며 새로 등록하셔야 합니다.")) {
+                localStorage.removeItem(STORAGE_KEY);
+                appState = {
+                    purchaseDate: null,
+                    points: 0,
+                    hasRewarded: {}
+                };
+                
+                document.getElementById('point-display').innerText = "0";
+                document.getElementById('welcome-view').classList.remove('hidden');
+                document.getElementById('active-view').classList.add('hidden');
+                document.getElementById('dday-hero-container').innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>
+
