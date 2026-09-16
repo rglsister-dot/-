@@ -1,0 +1,703 @@
+# -<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WearLog — NFC 옷 착용 기록</title>
+
+<style>
+:root{
+  --bg:#f5f6f8;
+  --card:#fff;
+  --text:#17191c;
+  --muted:#73777f;
+  --line:#e6e8ec;
+  --accent:#111
+}
+
+*{
+  box-sizing:border-box
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif
+}
+
+.wrap{
+  max-width:720px;
+  margin:auto;
+  padding:22px 16px 40px
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px
+}
+
+.logo{
+  font-size:24px;
+  font-weight:800;
+  letter-spacing:-1px
+}
+
+.tag{
+  font-size:12px;
+  padding:6px 9px;
+  border-radius:999px;
+  background:#e9eaed;
+  color:#444
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:20px;
+  margin:12px 0;
+  box-shadow:0 4px 16px #00000008
+}
+
+.hero{
+  padding:24px
+}
+
+.eyebrow{
+  font-size:13px;
+  color:var(--muted);
+  font-weight:700
+}
+
+.title{
+  font-size:28px;
+  line-height:1.2;
+  margin:7px 0
+}
+
+.sub{
+  color:var(--muted);
+  margin:0
+}
+
+button{
+  border:0;
+  border-radius:13px;
+  padding:13px 16px;
+  font-weight:750;
+  cursor:pointer;
+  background:var(--accent);
+  color:white
+}
+
+button.secondary{
+  background:#eef0f3;
+  color:#222
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:17px
+}
+
+.status{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:16px;
+  padding:12px;
+  border-radius:13px;
+  background:#f1f2f4;
+  font-weight:700
+}
+
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#999
+}
+
+.done .dot{
+  background:#20a35a
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px
+}
+
+.stat{
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:14px
+}
+
+.num{
+  font-size:23px;
+  font-weight:800
+}
+
+.label{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:3px
+}
+
+h2{
+  font-size:17px;
+  margin:0 0 14px
+}
+
+.calendar{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px
+}
+
+.day{
+  aspect-ratio:1;
+  border:1px solid var(--line);
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  position:relative;
+  background:#fff
+}
+
+.day.checked{
+  background:#17191c;
+  color:#fff;
+  border-color:#17191c
+}
+
+.day.today{
+  outline:2px solid #bbb;
+  outline-offset:1px
+}
+
+.day.future{
+  color:#c4c7cc;
+  background:#fafafa
+}
+
+.weekday{
+  font-size:11px;
+  color:var(--muted);
+  text-align:center;
+  padding:4px
+}
+
+.info{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.6
+}
+
+.url{
+  word-break:break-all;
+  background:#f1f2f4;
+  border-radius:10px;
+  padding:10px;
+  font-size:12px
+}
+
+input{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  font-size:16px
+}
+
+@media(max-width:480px){
+  .stats{
+    grid-template-columns:1fr 1fr 1fr
+  }
+
+  .hero{
+    padding:19px
+  }
+
+  .title{
+    font-size:25px
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <div class="top">
+    <div class="logo">WearLog</div>
+    <div class="tag">NFC CLOTHING PROJECT</div>
+  </div>
+
+  <section class="card hero">
+
+    <div class="eyebrow">
+      NFC 착용 기록
+    </div>
+
+    <div class="title" id="clothTitle">
+      옷 정보를 불러오는 중…
+    </div>
+
+    <p class="sub" id="dateText"></p>
+
+    <div class="status" id="status">
+      <span class="dot"></span>
+      <span id="statusText">
+        오늘 착용 기록을 확인하는 중…
+      </span>
+    </div>
+
+    <div class="actions">
+
+      <button id="checkBtn" onclick="checkToday()">
+        오늘 착용 기록하기
+      </button>
+
+      <button class="secondary" onclick="clearToday()">
+        기록 취소
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <section class="card">
+
+    <h2>
+      나의 기록
+    </h2>
+
+    <div class="stats">
+
+      <div class="stat">
+        <div class="num" id="total">0</div>
+        <div class="label">총 착용일</div>
+      </div>
+
+      <div class="stat">
+        <div class="num" id="month">0</div>
+        <div class="label">최근 30일</div>
+      </div>
+
+      <div class="stat">
+        <div class="num" id="streak">0</div>
+        <div class="label">현재 연속</div>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="card">
+
+    <h2>
+      최근 30일
+    </h2>
+
+    <div class="calendar" id="calendar"></div>
+
+  </section>
+
+
+  <section class="card">
+
+    <h2>
+      학생 이름
+    </h2>
+
+    <input
+      id="name"
+      placeholder="이름 또는 별명"
+      maxlength="20"
+    >
+
+    <div class="actions">
+
+      <button onclick="saveName()">
+        저장
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <section class="card">
+
+    <h2>
+      학교 활동에서 NFC를 연결하는 방법
+    </h2>
+
+    <p class="info">
+
+      각 옷의 NFC 태그에 아래처럼 옷 ID가 포함된
+      사이트 주소를 기록하면 됩니다.
+
+      휴대폰으로 태그를 터치하면 이 페이지가 열리고,
+      오늘 날짜가 자동으로 기록됩니다.
+
+    </p>
+
+    <div class="url" id="nfcUrl"></div>
+
+    <p class="info">
+
+      예:
+      <b>?cloth=hoodie01</b>
+      → 후드티 01번 태그
+
+    </p>
+
+  </section>
+
+</div>
+
+
+<script>
+
+const params = new URLSearchParams(location.search);
+
+const clothId =
+  params.get("cloth") || "demo01";
+
+
+const clothes = {
+
+  demo01:[
+    "NFC 테스트 의류",
+    "샘플 옷"
+  ],
+
+  hoodie01:[
+    "후드티 01",
+    "학생주도 봉사활동"
+  ],
+
+  tshirt01:[
+    "티셔츠 01",
+    "학생주도 봉사활동"
+  ],
+
+  jacket01:[
+    "자켓 01",
+    "학생주도 봉사활동"
+  ]
+
+};
+
+
+const info =
+  clothes[clothId] ||
+  [clothId,"NFC 의류"];
+
+
+const key =
+  "wearlog:" + clothId;
+
+
+let records =
+  JSON.parse(
+    localStorage.getItem(key) || "[]"
+  );
+
+
+const today = () =>
+  new Date()
+    .toISOString()
+    .slice(0,10);
+
+
+function fmt(d){
+
+  return new Intl.DateTimeFormat(
+    "ko-KR",
+    {
+      dateStyle:"full"
+    }
+  ).format(
+    new Date(d+"T00:00:00")
+  );
+
+}
+
+
+function save(){
+
+  localStorage.setItem(
+    key,
+    JSON.stringify(records)
+  );
+
+}
+
+
+function checkToday(){
+
+  const d = today();
+
+  if(!records.includes(d)){
+
+    records.push(d);
+
+    records.sort();
+
+    save();
+
+  }
+
+  render();
+
+}
+
+
+function clearToday(){
+
+  records =
+    records.filter(
+      x => x !== today()
+    );
+
+  save();
+
+  render();
+
+}
+
+
+function saveName(){
+
+  localStorage.setItem(
+    "wearlog-name",
+    document
+      .getElementById("name")
+      .value
+      .trim()
+  );
+
+  alert("이름이 저장되었습니다.");
+
+}
+
+
+function render(){
+
+  const d = today();
+
+
+  document
+    .getElementById("clothTitle")
+    .textContent = info[0];
+
+
+  document
+    .getElementById("dateText")
+    .textContent = fmt(d);
+
+
+  const done =
+    records.includes(d);
+
+
+  const st =
+    document.getElementById("status");
+
+
+  st.className =
+    "status" +
+    (done ? " done" : "");
+
+
+  document
+    .getElementById("statusText")
+    .textContent =
+      done
+      ? "오늘 착용 기록 완료 ✓"
+      : "오늘은 아직 기록하지 않았어요";
+
+
+  document
+    .getElementById("checkBtn")
+    .textContent =
+      done
+      ? "오늘 기록 완료"
+      : "오늘 착용 기록하기";
+
+
+  document
+    .getElementById("checkBtn")
+    .disabled = done;
+
+
+  document
+    .getElementById("total")
+    .textContent =
+      records.length;
+
+
+  const now =
+    new Date();
+
+
+  const past =
+    new Date(now);
+
+
+  past.setDate(
+    now.getDate() - 29
+  );
+
+
+  document
+    .getElementById("month")
+    .textContent =
+      records.filter(
+        x =>
+          new Date(
+            x+"T00:00:00"
+          ) >=
+          new Date(
+            past.toDateString()
+          )
+      ).length;
+
+
+  let streak = 0;
+
+  let cur =
+    new Date(
+      d+"T00:00:00"
+    );
+
+
+  while(
+    records.includes(
+      cur.toISOString().slice(0,10)
+    )
+  ){
+
+    streak++;
+
+    cur.setDate(
+      cur.getDate()-1
+    );
+
+  }
+
+
+  document
+    .getElementById("streak")
+    .textContent =
+      streak;
+
+
+  const cal =
+    document.getElementById(
+      "calendar"
+    );
+
+
+  cal.innerHTML = "";
+
+
+  [
+    "일",
+    "월",
+    "화",
+    "수",
+    "목",
+    "금",
+    "토"
+  ].forEach(x => {
+
+    cal.insertAdjacentHTML(
+      "beforeend",
+      `<div class="weekday">${x}</div>`
+    );
+
+  });
+
+
+  for(
+    let i=29;
+    i>=0;
+    i--
+  ){
+
+    const x =
+      new Date();
+
+    x.setHours(
+      0,0,0,0
+    );
+
+    x.setDate(
+      x.getDate()-i
+    );
+
+
+    const ds =
+      x.toISOString()
+       .slice(0,10);
+
+
+    cal.insertAdjacentHTML(
+
+      "beforeend",
+
+      `<div class="day ${
+        records.includes(ds)
+        ? "checked"
+        : ""
+      } ${
+        ds===d
+        ? "today"
+        : ""
+      }">${x.getDate()}</div>`
+
+    );
+
+  }
+
+
+  document
+    .getElementById("nfcUrl")
+    .textContent =
+      location.origin +
+      location.pathname +
+      "?cloth=" +
+      encodeURIComponent(clothId);
+
+}
+
+
+document
+  .getElementById("name")
+  .value =
+    localStorage.getItem(
+      "wearlog-name"
+    ) || "";
+
+
+render();
+
+</script>
+
+</body>
+</html>
